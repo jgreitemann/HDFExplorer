@@ -7,10 +7,18 @@ class BrowserWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
 
-        self.button = Gtk.Button(label="Click Here")
-        self.button.connect("clicked", self.on_button_clicked)
-        self.add(self.button)
+        self.tree_store = Gtk.ListStore(str)
 
-    def on_button_clicked(self, widget):
-        print("Hello World")
+        dummy_data = ['correct', 'horse', 'battery', 'staple']
+        for dummy in dummy_data:
+            self.tree_store.append((dummy,))
+
+        self.tree_view = Gtk.TreeView(self.tree_store)
+        name_col = Gtk.TreeViewColumn("Dataset",
+                                      Gtk.CellRendererText(),
+                                      text=0)
+        self.tree_view.append_column(name_col)
+        self.scroll = Gtk.ScrolledWindow()
+        self.scroll.add(self.tree_view)
+        self.add(self.scroll)
 
