@@ -10,7 +10,10 @@ class BrowserWindow(Gtk.Window):
         Gtk.Window.__init__(self, title="Hello World")
 
         data = {'correct': None,
-                'horse': None,
+                'horse': {'Shetland pony': None,
+                          'Spanish Mustang': None,
+                          'Brandenburger': None,
+                          'Freiberger': None},
                 'battery': {'AA': None,
                             'AAA': None,
                             'AAAA': None},

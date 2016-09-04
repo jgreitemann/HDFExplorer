@@ -76,20 +76,23 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         if not self.pool[iter.user_data][-1] in sorted_keys:
             return (False, None)
         i = sorted_keys.index(self.pool[iter.user_data][-1])
-        ud = copy(self.pool[iter.user_data])
         if i + 1 >= len(sorted_keys):
             return (False, None)
+        ud = copy(self.pool[iter.user_data])
         ud[-1] = sorted_keys[i + 1]
         iter.user_data = id(ud)
         self.pool[id(ud)] = ud
         return (True, iter)
 
 
-    # def do_iter_children(self, parent):
-    #     print("iter_children")
+    def do_iter_children(self, parent):
+        return self.do_iter_nth_child(parent, 0)
 
     def do_iter_has_child(self, iter):
-        return False
+        base = self.data
+        for key in self.pool[iter.user_data]:
+            base = base[key]
+        return bool(base)
 
     # def do_iter_n_children(self, iter):
     #     print("iter_n_children")
@@ -113,8 +116,15 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         iter.user_data = id(ud)
         return (True, iter)
 
-    # def do_iter_parent(self, child):
-    #     print("iter_parent")
+    def do_iter_parent(self, child):
+        ud = copy(self.pool[child.user_data])
+        ud.pop()
+        if not ud:
+            return (False, None)
+        self.pool[id(ud)] = ud
+        iter = Gtk.TreeIter()
+        iter.user_data = id(ud)
+        return (True, iter)
 
     # def do_ref_node(self, iter):
     #     print("ref_node")
