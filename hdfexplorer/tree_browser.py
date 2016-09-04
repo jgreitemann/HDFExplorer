@@ -9,7 +9,13 @@ class BrowserWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
 
-        self.tree_store = hdfexplorer.h5TreeModel.h5TreeModel()
+        data = {'correct': None,
+                'horse': None,
+                'battery': {'AA': None,
+                            'AAA': None,
+                            'AAAA': None},
+                'staple': None}
+        self.tree_store = hdfexplorer.h5TreeModel.h5TreeModel(data)
 
         self.tree_view = Gtk.TreeView(self.tree_store)
         name_col = Gtk.TreeViewColumn("Dataset",
