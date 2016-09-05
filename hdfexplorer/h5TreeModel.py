@@ -28,6 +28,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
             sorted_keys = sorted(list(base.keys()))
             seq.append(sorted_keys[i])
             base = base[sorted_keys[i]]
+        seq = tuple(seq)
         self.pool[id(seq)] = seq
         iter = Gtk.TreeIter()
         iter.user_data = id(seq)
@@ -64,8 +65,9 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
             sorted_keys = sorted(list(self.data.keys()))
             if not sorted_keys:
                 return (False, None)
-            iter.user_data = (sorted_keys[0],)
-            self.pool[id(iter.user_data)] = iter.user_data
+            ud = (sorted_keys[0],)
+            self.pool[id(ud)] = ud
+            iter.user_data = id(ud)
             return (True, iter)
         base = self.data
         for key in self.pool[iter.user_data][:-1]:
@@ -78,8 +80,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         i = sorted_keys.index(self.pool[iter.user_data][-1])
         if i + 1 >= len(sorted_keys):
             return (False, None)
-        ud = copy(self.pool[iter.user_data])
-        ud[-1] = sorted_keys[i + 1]
+        ud = (*self.pool[iter.user_data][:-1], sorted_keys[i + 1])
         iter.user_data = id(ud)
         self.pool[id(ud)] = ud
         return (True, iter)
@@ -106,19 +107,18 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
                 base = base[key]
             ud = copy(self.pool[parent.user_data])
         else:
-            ud = []
+            ud = ()
         if n >= len(base):
             return (False, None)
         sorted_keys = sorted(list(base.keys()))
-        ud.append(sorted_keys[n])
+        ud += (sorted_keys[n],)
         self.pool[id(ud)] = ud
         iter = Gtk.TreeIter()
         iter.user_data = id(ud)
         return (True, iter)
 
     def do_iter_parent(self, child):
-        ud = copy(self.pool[child.user_data])
-        ud.pop()
+        ud = self.pool[child.user_data][:-1]
         if not ud:
             return (False, None)
         self.pool[id(ud)] = ud
