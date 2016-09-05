@@ -60,7 +60,11 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         return Gtk.TreePath(tuple(indices))
 
     def do_get_value(self, iter, column):
-        return self.pool[iter.user_data][-1]
+        if column == 0:
+            return self.pool[iter.user_data][-1]
+        elif column == 1:
+            return 'folder' if self.do_iter_has_child(iter) \
+                    else 'text-x-generic'
 
     def do_iter_next(self, iter):
         if iter.user_data is None:
