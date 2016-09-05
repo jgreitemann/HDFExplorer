@@ -1,3 +1,4 @@
+import h5py
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
@@ -5,8 +6,8 @@ from gi.repository import GObject, Gtk
 abshash = lambda x: abs(hash(x))
 
 class h5TreeModel(GObject.Object, Gtk.TreeModel):
-    def __init__(self, d):
-        self.data = d
+    def __init__(self, f):
+        self.h5file = f
         self.pool = {}
         GObject.GObject.__init__(self)
 
@@ -21,7 +22,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
 
     def do_get_iter(self, path):
         seq = []
-        base = self.data
+        base = self.h5file
         for i in path.get_indices():
             if base is None or i >= len(base):
                 return (False, None)
@@ -49,7 +50,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
 
     def do_get_path(self, iter):
         indices = []
-        base = self.data
+        base = self.h5file
         for key in self.pool[iter.user_data]:
             if not key in base:
                 return None
@@ -63,14 +64,14 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
 
     def do_iter_next(self, iter):
         if iter.user_data is None:
-            sorted_keys = sorted(list(self.data.keys()))
+            sorted_keys = sorted(list(self.h5file.keys()))
             if not sorted_keys:
                 return (False, None)
             ud = (sorted_keys[0],)
             self.pool[abshash(ud)] = ud
             iter.user_data = abshash(ud)
             return (True, iter)
-        base = self.data
+        base = self.h5file
         for key in self.pool[iter.user_data][:-1]:
             if not key in base:
                 return (False, None)
@@ -92,16 +93,16 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         return self.do_iter_nth_child(parent, 0)
 
     def do_iter_has_child(self, iter):
-        base = self.data
+        base = self.h5file
         for key in self.pool[iter.user_data]:
             base = base[key]
-        return bool(base)
+        return isinstance(base, h5py.Group)
 
     # def do_iter_n_children(self, iter):
     #     print("iter_n_children")
 
     def do_iter_nth_child(self, parent, n):
-        base = self.data
+        base = self.h5file
         if parent is not None:
             for key in self.pool[parent.user_data]:
                 if not key in base:

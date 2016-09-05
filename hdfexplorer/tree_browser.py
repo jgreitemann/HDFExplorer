@@ -1,3 +1,4 @@
+import h5py
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -9,16 +10,8 @@ class BrowserWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Hello World")
 
-        data = {'correct': None,
-                'horse': {'Shetland pony': None,
-                          'Spanish Mustang': None,
-                          'Brandenburger': None,
-                          'Freiberger': None},
-                'battery': {'AA': None,
-                            'AAA': None,
-                            'AAAA': None},
-                'staple': None}
-        self.tree_store = hdfexplorer.h5TreeModel.h5TreeModel(data)
+        f = h5py.File("/home/jgreitemann/bold_test.out.h5", "r")
+        self.tree_store = hdfexplorer.h5TreeModel.h5TreeModel(f)
 
         self.tree_view = Gtk.TreeView(self.tree_store)
         name_col = Gtk.TreeViewColumn("Dataset",
