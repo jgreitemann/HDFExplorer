@@ -1,8 +1,8 @@
-from copy import copy
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
+abshash = lambda x: abs(hash(x))
 
 class h5TreeModel(GObject.Object, Gtk.TreeModel):
     def __init__(self, d):
@@ -29,9 +29,10 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
             seq.append(sorted_keys[i])
             base = base[sorted_keys[i]]
         seq = tuple(seq)
-        self.pool[id(seq)] = seq
+        self.pool[abshash(seq)] = seq
         iter = Gtk.TreeIter()
-        iter.user_data = id(seq)
+        iter.user_data = abshash(seq)
+        iter.user_data2 = 42
         return (True, iter)
 
     # def do_get_iter_from_string(self, path_string):
@@ -66,8 +67,8 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
             if not sorted_keys:
                 return (False, None)
             ud = (sorted_keys[0],)
-            self.pool[id(ud)] = ud
-            iter.user_data = id(ud)
+            self.pool[abshash(ud)] = ud
+            iter.user_data = abshash(ud)
             return (True, iter)
         base = self.data
         for key in self.pool[iter.user_data][:-1]:
@@ -81,8 +82,9 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         if i + 1 >= len(sorted_keys):
             return (False, None)
         ud = (*self.pool[iter.user_data][:-1], sorted_keys[i + 1])
-        iter.user_data = id(ud)
-        self.pool[id(ud)] = ud
+        self.pool[abshash(ud)] = ud
+        iter.user_data = abshash(ud)
+        iter.user_data2 = 43
         return (True, iter)
 
 
@@ -105,25 +107,27 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
                 if not key in base:
                     return (False, None)
                 base = base[key]
-            ud = copy(self.pool[parent.user_data])
+            ud = self.pool[parent.user_data]
         else:
             ud = ()
         if n >= len(base):
             return (False, None)
         sorted_keys = sorted(list(base.keys()))
         ud += (sorted_keys[n],)
-        self.pool[id(ud)] = ud
+        self.pool[abshash(ud)] = ud
         iter = Gtk.TreeIter()
-        iter.user_data = id(ud)
+        iter.user_data = abshash(ud)
+        iter.user_data2 = 44
         return (True, iter)
 
     def do_iter_parent(self, child):
         ud = self.pool[child.user_data][:-1]
         if not ud:
             return (False, None)
-        self.pool[id(ud)] = ud
+        self.pool[abshash(ud)] = ud
         iter = Gtk.TreeIter()
-        iter.user_data = id(ud)
+        iter.user_data = abshash(ud)
+        iter.user_data2 = 45
         return (True, iter)
 
     # def do_ref_node(self, iter):
