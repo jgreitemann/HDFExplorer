@@ -5,12 +5,12 @@ from gi.repository import Gtk
 
 import hdfexplorer.h5TreeModel
 
-class BrowserWindow(Gtk.Window):
+class BrowserWindow(Gtk.ApplicationWindow):
 
-    def __init__(self):
-        Gtk.Window.__init__(self, title="Hello World")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        f = h5py.File("/home/jgreitemann/bold_test.out.h5", "r")
+        f = h5py.File("/home/j/J.Greitemann/bold_test.out.h5", "r")
         self.tree_store = hdfexplorer.h5TreeModel.h5TreeModel(f)
 
         self.tree_view = Gtk.TreeView(self.tree_store)
@@ -25,4 +25,5 @@ class BrowserWindow(Gtk.Window):
         self.scroll = Gtk.ScrolledWindow()
         self.scroll.add(self.tree_view)
         self.add(self.scroll)
+        self.scroll.show_all()
 

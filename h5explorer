@@ -1,10 +1,46 @@
 #!/usr/bin/env python3
-import hdfexplorer.tree_browser
+import sys
+import time
+from hdfexplorer.tree_browser import BrowserWindow
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gio, GLib
 
-win = hdfexplorer.tree_browser.BrowserWindow()
-win.connect("delete-event", Gtk.main_quit)
-win.show_all()
-Gtk.main()
+class h5Application(Gtk.Application):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, application_id="de.greitemann.h5explorer",
+                         flags=Gio.ApplicationFlags.HANDLES_OPEN,
+                         **kwargs)
+        self.window = None
+
+    def do_startup(self):
+        Gtk.Application.do_startup(self)
+
+        action = Gio.SimpleAction.new("about", None)
+        action.connect("activate", self.on_about)
+        self.add_action(action)
+
+        action = Gio.SimpleAction.new("quit", None)
+        action.connect("activate", self.on_quit)
+        self.add_action(action)
+
+    def do_activate(self):
+        print("activate")
+        if not self.window:
+            self.window = BrowserWindow(application=self, title="Main Window")
+        self.window.present()
+
+    def do_open(self, files, hint):
+        print("open:", files)
+
+    def on_about(self, action, param):
+        about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)
+        about_dialog.present()
+
+    def on_quit(self, action, param):
+        self.quit()
+
+
+if __name__ == "__main__":
+    app = h5Application()
+    app.run(sys.argv)

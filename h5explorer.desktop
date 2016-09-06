@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=0.1
+Encoding=UTF-8
+Name=HDF5 Explorer
+Comment=View HDF5 files
+Exec=h5explorer
+Icon=application-default-icon
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=GNOME;GTK;Utility;
+MimeType=application/x-hdf;
