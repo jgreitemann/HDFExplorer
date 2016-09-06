@@ -86,7 +86,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         i = sorted_keys.index(self.pool[iter.user_data][-1])
         if i + 1 >= len(sorted_keys):
             return (False, None)
-        ud = (*self.pool[iter.user_data][:-1], sorted_keys[i + 1])
+        ud = self.pool[iter.user_data][:-1] + (sorted_keys[i + 1], )
         self.pool[abshash(ud)] = ud
         iter.user_data = abshash(ud)
         iter.user_data2 = 43
