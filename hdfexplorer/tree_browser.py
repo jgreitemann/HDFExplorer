@@ -10,6 +10,7 @@ class BrowserWindow(Gtk.ApplicationWindow):
 
     def __init__(self, *args, path=None, **kwargs):
         super().__init__(title="(Empty)", *args, **kwargs)
+        self.set_default_size(250, 500)
 
         self._h5f = None
         self.model = None
