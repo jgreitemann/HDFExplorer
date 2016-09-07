@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 import sys
 import time
-from hdfexplorer.tree_browser import BrowserWindow
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GLib
+
+from hdfexplorer.tree_browser import BrowserWindow
 
 class h5Application(Gtk.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, application_id="de.greitemann.h5explorer",
                          flags=Gio.ApplicationFlags.HANDLES_OPEN,
                          **kwargs)
-        self.window = None
+        self.windows = []
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -25,13 +26,18 @@ class h5Application(Gtk.Application):
         self.add_action(action)
 
     def do_activate(self):
-        print("activate")
-        if not self.window:
-            self.window = BrowserWindow(application=self, title="Main Window")
-        self.window.present()
+        if not self.windows:
+            self.windows.append(BrowserWindow(application=self))
+        self.windows[-1].present()
 
-    def do_open(self, files, hint):
-        print("open:", files)
+    def do_open(self, files, n_files, hint):
+        for file in files:
+            if self.windows and self.windows[-1].model is None:
+                self.windows[-1].load(file.get_path())
+            else:
+                self.windows.append(BrowserWindow(application=self,
+                                                  path=file.get_path()))
+            self.windows[-1].present()
 
     def on_about(self, action, param):
         about_dialog = Gtk.AboutDialog(transient_for=self.window, modal=True)

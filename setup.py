@@ -10,4 +10,5 @@ setup(name='HDFExplorer',
       url='https://www.github.com/jgreitemann/HDFExplorer',
       packages=['hdfexplorer'],
       scripts=['h5explorer'],
+      data_files=[('share/applications', ['h5explorer.desktop'])]
      )
