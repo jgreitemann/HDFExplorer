@@ -10,5 +10,10 @@ setup(name='HDFExplorer',
       url='https://www.github.com/jgreitemann/HDFExplorer',
       packages=['hdfexplorer'],
       scripts=['h5explorer'],
-      data_files=[('share/applications', ['h5explorer.desktop'])]
+      data_files=[('share/applications', ['h5explorer.desktop']),
+                  ('share/icons/hicolor/256x256/mimetypes', ['icons/hicolor/256x256/mimetypes/application-x-hdf.png']),
+                  ('share/icons/hicolor/48x48/mimetypes', ['icons/hicolor/48x48/mimetypes/application-x-hdf.png']),
+                  ('share/icons/hicolor/32x32/mimetypes', ['icons/hicolor/32x32/mimetypes/application-x-hdf.png']),
+                  ('share/icons/hicolor/24x24/mimetypes', ['icons/hicolor/24x24/mimetypes/application-x-hdf.png']),
+                  ('share/icons/hicolor/16x16/mimetypes', ['icons/hicolor/16x16/mimetypes/application-x-hdf.png'])]
      )
