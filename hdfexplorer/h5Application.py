@@ -24,6 +24,10 @@ class h5Application(Gtk.Application):
         action.connect("activate", self.on_quit)
         self.add_action(action)
 
+        action = Gio.SimpleAction.new("open", None)
+        action.connect("activate", self.on_open)
+        self.add_action(action)
+
         menu_file = path.join(path.dirname(__file__), "data/ui/menu.ui")
         builder = Gtk.Builder.new_from_file(menu_file)
         self.set_app_menu(builder.get_object("app-menu"))
@@ -35,12 +39,39 @@ class h5Application(Gtk.Application):
 
     def do_open(self, files, n_files, hint):
         for file in files:
-            if self.windows and self.windows[-1].model is None:
-                self.windows[-1].load(file.get_path())
-            else:
-                self.windows.append(BrowserWindow(application=self,
-                                                  path=file.get_path()))
-            self.windows[-1].present()
+            self.open_filename(file.get_path())
+
+    def on_open(self, action, param):
+        chooser = Gtk.FileChooserDialog("Open HDF5 File",
+                                        self.windows[-1],
+                                        Gtk.FileChooserAction.OPEN,
+                                        (Gtk.STOCK_CANCEL,
+                                         Gtk.ResponseType.CANCEL,
+                                         Gtk.STOCK_OPEN,
+                                         Gtk.ResponseType.ACCEPT))
+        filter_hdf = Gtk.FileFilter()
+        filter_hdf.set_name("HDF5 files")
+        filter_hdf.add_mime_type("application/x-hdf")
+        chooser.add_filter(filter_hdf)
+
+        filter_any = Gtk.FileFilter()
+        filter_any.set_name("Any files")
+        filter_any.add_pattern("*")
+        chooser.add_filter(filter_any)
+
+        res = chooser.run()
+        if res == Gtk.ResponseType.ACCEPT:
+            self.open_filename(chooser.get_filename())
+
+        chooser.destroy()
+
+    def open_filename(self, filename):
+        if self.windows and self.windows[-1].model is None:
+            self.windows[-1].load(filename)
+        else:
+            self.windows.append(BrowserWindow(application=self,
+                                              path=file.get_path()))
+        self.windows[-1].present()
 
     def on_about(self, action, param):
         about_dialog = Gtk.AboutDialog(transient_for=self.windows[-1],
