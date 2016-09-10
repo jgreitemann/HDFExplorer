@@ -1,7 +1,8 @@
 import h5py
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gtk
+from gi.repository import GObject, Gtk, GdkPixbuf
+from os import path
 
 abshash = lambda x: abs(hash(x))
 
@@ -9,6 +10,11 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
     def __init__(self, f):
         self.h5file = f
         self.pool = {}
+        self.group_pixbuf = Gtk.IconTheme.get_default() \
+                                         .choose_icon(["folder"], 16, 0) \
+                                         .load_icon()
+        icon_file = path.join(path.dirname(__file__), "data/icons/dataset.png")
+        self.dataset_pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_file)
         GObject.GObject.__init__(self)
 
     def do_get_flags(self):
@@ -63,8 +69,8 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         if column == 0:
             return self.pool[iter.user_data][-1]
         elif column == 1:
-            return 'folder' if self.do_iter_has_child(iter) \
-                    else 'text-x-generic'
+            return self.group_pixbuf if self.do_iter_has_child(iter) \
+                    else self.dataset_pixbuf
 
     def do_iter_next(self, iter):
         if iter.user_data is None:
