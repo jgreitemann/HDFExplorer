@@ -85,7 +85,7 @@ class h5Application(Gtk.Application):
         about_dialog.set_version("0.1")
         website = "https://www.github.com/jgreitemann/HDFExplorer"
         about_dialog.set_website(website)
-        about_dialog.set_website_label("Website")
+        about_dialog.set_website_label("Fork me on GitHub")
         about_dialog.add_credit_section("HDF5 backend", ["h5py"])
         about_dialog.add_credit_section("App icon based on", ["GNOME Terminal"])
         about_dialog.present()
