@@ -70,7 +70,7 @@ class h5Application(Gtk.Application):
             self.windows[-1].load(filename)
         else:
             self.windows.append(BrowserWindow(application=self,
-                                              path=file.get_path()))
+                                              path=filename))
         self.windows[-1].present()
 
     def on_about(self, action, param):
