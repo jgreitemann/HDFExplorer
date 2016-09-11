@@ -6,7 +6,7 @@ from gi.repository import Gtk
 
 import hdfexplorer.h5TreeModel
 
-class BrowserWindow(Gtk.ApplicationWindow):
+class h5BrowserWindow(Gtk.ApplicationWindow):
 
     def __init__(self, *args, path=None, **kwargs):
         super().__init__(title="(Empty)", *args, **kwargs)

@@ -4,7 +4,7 @@ from gi.repository import Gtk, Gio, GLib
 
 from os import path
 
-from .tree_browser import BrowserWindow
+from .h5BrowserWindow import h5BrowserWindow
 
 class h5Application(Gtk.Application):
     def __init__(self, *args, **kwargs):
@@ -34,7 +34,7 @@ class h5Application(Gtk.Application):
 
     def do_activate(self):
         if not self.windows:
-            self.windows.append(BrowserWindow(application=self))
+            self.windows.append(h5BrowserWindow(application=self))
         self.windows[-1].present()
 
     def do_open(self, files, n_files, hint):
@@ -69,7 +69,7 @@ class h5Application(Gtk.Application):
         if self.windows and self.windows[-1].model is None:
             self.windows[-1].load(filename)
         else:
-            self.windows.append(BrowserWindow(application=self,
+            self.windows.append(h5BrowserWindow(application=self,
                                               path=filename))
         self.windows[-1].present()
 
