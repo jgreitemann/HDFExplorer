@@ -74,8 +74,8 @@ class h5Application(Gtk.Application):
         self.windows[-1].present()
 
     def on_about(self, action, param):
-        about_dialog = Gtk.AboutDialog(transient_for=self.windows[-1],
-                                       modal=True)
+        about_dialog = Gtk.AboutDialog(transient_for=None,
+                                       modal=False)
         about_dialog.set_comments("The much-needed alternative to HDFView")
         about_dialog.set_authors(["Jonas Greitemann"])
         about_dialog.set_copyright("Copyright © 2016 Jonas Greitemann")
