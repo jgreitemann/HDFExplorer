@@ -4,14 +4,14 @@ from gi.repository import Gtk, Gio, GLib
 
 from os import path
 
-from .h5BrowserWindow import h5BrowserWindow
+from .h5Document import h5Document
 
 class h5Application(Gtk.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, application_id="de.greitemann.h5explorer",
                          flags=Gio.ApplicationFlags.HANDLES_OPEN,
                          **kwargs)
-        self.windows = []
+        self.documents = []
 
     def do_startup(self):
         Gtk.Application.do_startup(self)
@@ -33,9 +33,8 @@ class h5Application(Gtk.Application):
         self.set_app_menu(builder.get_object("app-menu"))
 
     def do_activate(self):
-        if not self.windows:
-            self.windows.append(h5BrowserWindow(application=self))
-        self.windows[-1].present()
+        if not self.documents:
+            self.documents.append(h5Document(self))
 
     def do_open(self, files, n_files, hint):
         for file in files:
@@ -43,7 +42,7 @@ class h5Application(Gtk.Application):
 
     def on_open(self, action, param):
         chooser = Gtk.FileChooserDialog("Open HDF5 File",
-                                        self.windows[-1],
+                                        self.get_active_window(),
                                         Gtk.FileChooserAction.OPEN,
                                         (Gtk.STOCK_CANCEL,
                                          Gtk.ResponseType.CANCEL,
@@ -66,26 +65,15 @@ class h5Application(Gtk.Application):
         chooser.destroy()
 
     def open_filename(self, filename):
-        if self.windows and self.windows[-1].model is None:
-            self.windows[-1].load(filename)
+        if self.documents and self.documents[-1].model is None:
+            self.documents[-1].load(filename)
         else:
-            self.windows.append(h5BrowserWindow(application=self,
-                                              path=filename))
-        self.windows[-1].present()
+            self.documents.append(h5Document(self, path=filename))
 
     def on_about(self, action, param):
-        about_dialog = Gtk.AboutDialog(transient_for=None,
-                                       modal=False)
-        about_dialog.set_comments("The much-needed alternative to HDFView")
-        about_dialog.set_authors(["Jonas Greitemann"])
-        about_dialog.set_copyright("Copyright © 2016 Jonas Greitemann")
-        about_dialog.set_license_type(Gtk.License.GPL_3_0)
-        about_dialog.set_logo_icon_name("jgreitemann-h5explorer")
-        about_dialog.set_program_name("HDF Explorer")
-        about_dialog.set_version("0.1")
-        website = "https://www.github.com/jgreitemann/HDFExplorer"
-        about_dialog.set_website(website)
-        about_dialog.set_website_label("Fork me on GitHub")
+        about_file = path.join(path.dirname(__file__), "data/glade/about.glade")
+        builder = Gtk.Builder.new_from_file(about_file)
+        about_dialog = builder.get_object("about-dialog")
         about_dialog.add_credit_section("HDF5 backend", ["h5py"])
         about_dialog.add_credit_section("App icon based on", ["GNOME Terminal"])
         about_dialog.present()
