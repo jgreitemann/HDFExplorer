@@ -20,6 +20,7 @@ class h5Document(GObject.Object):
         self.window = builder.get_object("app-window")
         self.app.add_window(self.window)
         self.tree_view = builder.get_object("content-view")
+        self.stack = builder.get_object("stack")
 
         dset_col = Gtk.TreeViewColumn("Datasets")
         icon_cell = Gtk.CellRendererPixbuf()
@@ -33,7 +34,8 @@ class h5Document(GObject.Object):
         if path is not None:
             self.load(path)
 
-        handlers = {"on_close": self.on_close}
+        handlers = {"on_close": self.on_close,
+                    "on_selection_changed": self.on_selection_changed}
         builder.connect_signals(handlers)
 
         self.window.present()
@@ -59,6 +61,17 @@ class h5Document(GObject.Object):
         self.window.set_title(basename(path))
         self.model = hdfexplorer.h5TreeModel.h5TreeModel(self._h5f)
         self.tree_view.set_model(self.model)
+
+    def on_selection_changed(self, tree_selection):
+        model, iter = tree_selection.get_selected()
+        if model is None or iter is None:
+            self.stack.set_visible_child_name("placeholder")
+            return
+        h5_object = model.get_h5_object(iter)
+        if not isinstance(h5_object, h5py.Dataset):
+            self.stack.set_visible_child_name("placeholder")
+            return
+        self.stack.set_visible_child_name("dataset-tree")
 
     def on_close(self, window, event):
         self.app.remove_window(window)
