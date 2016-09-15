@@ -43,7 +43,19 @@ class h5Document(GObject.Object):
             self.tree_view.set_model(None)
             self.model = None
             self._h5f.close()
-        self._h5f = h5py.File(path, "r")
+        try:
+            self._h5f = h5py.File(path, "r")
+        except OSError as e:
+            message = Gtk.MessageDialog(self.window,
+                                        Gtk.DialogFlags.DESTROY_WITH_PARENT,
+                                        Gtk.MessageType.ERROR,
+                                        Gtk.ButtonsType.CANCEL,
+                                        "Error opening file \"{}\""
+                                        .format(basename(path)))
+            message.format_secondary_text("{}".format(e))
+            message.run()
+            message.destroy()
+            return
         self.window.set_title(basename(path))
         self.model = hdfexplorer.h5TreeModel.h5TreeModel(self._h5f)
         self.tree_view.set_model(self.model)
