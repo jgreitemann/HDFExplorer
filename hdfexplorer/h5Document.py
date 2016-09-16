@@ -2,7 +2,7 @@ import h5py
 from os.path import join, dirname, basename
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gtk
+from gi.repository import GObject, Gtk, Pango
 
 from .h5TreeModel import h5TreeModel
 from .h5DatasetModel import h5DatasetModel
@@ -83,21 +83,25 @@ class h5Document(GObject.Object):
         # clear tree view columns & create new ones
         for c in self.dset_tree.get_columns():
             self.dset_tree.remove_column(c)
-        col = Gtk.TreeViewColumn("#")
+        col = Gtk.TreeViewColumn("")
         cell = Gtk.CellRendererText()
+        cell.set_property("foreground", "#979a9b")
+        cell.set_property("xalign", 0.5)
+        cell.set_property("font", "Cantarell Bold 11")
         col.pack_start(cell, False)
         col.add_attribute(cell, "text", 0)
         self.dset_tree.append_column(col)
         for i in range(self.entities[h5_path].do_get_n_columns() - 1):
             col = Gtk.TreeViewColumn(str(i))
             cell = Gtk.CellRendererText()
+            cell.set_property("xalign", 1.0)
             col.pack_start(cell, False)
             col.add_attribute(cell, "text", i+1)
             self.dset_tree.append_column(col)
 
         # put changes in effect
         self.dset_tree.set_model(self.entities[h5_path])
-        self.stack.set_visible_child_name("dataset-tree")
+        self.stack.set_visible_child_name("dataset-scroll")
 
     def on_close(self, window, event):
         self.app.remove_window(window)
