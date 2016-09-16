@@ -4,7 +4,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-import hdfexplorer.h5TreeModel
+import hdfexplorer.h5TreeModel, hdfexplorer.h5DatasetModel
 
 class h5Document(GObject.Object):
 
@@ -21,6 +21,7 @@ class h5Document(GObject.Object):
         self.app.add_window(self.window)
         self.tree_view = builder.get_object("content-view")
         self.stack = builder.get_object("stack")
+        self.dset_tree = builder.get_object("dataset-tree")
 
         dset_col = Gtk.TreeViewColumn("Datasets")
         icon_cell = Gtk.CellRendererPixbuf()
@@ -71,12 +72,28 @@ class h5Document(GObject.Object):
         if not isinstance(h5_object, h5py.Dataset):
             self.stack.set_visible_child_name("placeholder")
             return
+        new_model = hdfexplorer.h5DatasetModel.h5DatasetModel(h5_object)
+        for c in self.dset_tree.get_columns():
+            self.dset_tree.remove_column(c)
+        col = Gtk.TreeViewColumn("#")
+        cell = Gtk.CellRendererText()
+        col.pack_start(cell, False)
+        col.add_attribute(cell, "text", 0)
+        self.dset_tree.append_column(col)
+        for i in range(new_model.do_get_n_columns() - 1):
+            col = Gtk.TreeViewColumn(str(i))
+            cell = Gtk.CellRendererText()
+            col.pack_start(cell, False)
+            col.add_attribute(cell, "text", i+1)
+            self.dset_tree.append_column(col)
+        self.dset_tree.set_model(new_model)
         self.stack.set_visible_child_name("dataset-tree")
 
     def on_close(self, window, event):
         self.app.remove_window(window)
         if self._h5f:
             self.tree_view.set_model(None)
+            self.dset_tree.set_model(None)
             self.model = None
             self._h5f.close()
         self.app.documents.remove(self)
