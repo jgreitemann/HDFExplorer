@@ -74,6 +74,7 @@ class h5Application(Gtk.Application):
         about_file = path.join(path.dirname(__file__), "data/glade/about.glade")
         builder = Gtk.Builder.new_from_file(about_file)
         about_dialog = builder.get_object("about-dialog")
+        about_dialog.set_transient_for(self.get_active_window())
         about_dialog.add_credit_section("HDF5 backend", ["h5py"])
         about_dialog.add_credit_section("App icon based on", ["GNOME Terminal"])
         about_dialog.present()
