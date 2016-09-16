@@ -67,12 +67,14 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
 
     def get_h5_object(self, iter):
         base = self.h5file
+        pathstr = "/"
         for key in self.pool[iter.user_data]:
             if not key in base:
                 return None
             sorted_keys = sorted(list(base.keys()))
             base = base[key]
-        return base
+            pathstr += key
+        return (pathstr, base)
 
     def do_get_value(self, iter, column):
         if column == 0:

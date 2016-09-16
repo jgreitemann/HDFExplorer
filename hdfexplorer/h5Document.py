@@ -4,7 +4,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gtk
 
-import hdfexplorer.h5TreeModel, hdfexplorer.h5DatasetModel
+from .h5TreeModel import h5TreeModel
+from .h5DatasetModel import h5DatasetModel
 
 class h5Document(GObject.Object):
 
@@ -14,6 +15,7 @@ class h5Document(GObject.Object):
 
         self._h5f = None
         self.model = None
+        self.entities = {}
 
         document_file = join(dirname(__file__), "data/glade/document.glade")
         builder = Gtk.Builder.new_from_file(document_file)
@@ -60,7 +62,7 @@ class h5Document(GObject.Object):
             message.destroy()
             return
         self.window.set_title(basename(path))
-        self.model = hdfexplorer.h5TreeModel.h5TreeModel(self._h5f)
+        self.model = h5TreeModel(self._h5f)
         self.tree_view.set_model(self.model)
 
     def on_selection_changed(self, tree_selection):
@@ -68,11 +70,17 @@ class h5Document(GObject.Object):
         if model is None or iter is None:
             self.stack.set_visible_child_name("placeholder")
             return
-        h5_object = model.get_h5_object(iter)
+        h5_path, h5_object = model.get_h5_object(iter)
         if not isinstance(h5_object, h5py.Dataset):
             self.stack.set_visible_child_name("placeholder")
             return
-        new_model = hdfexplorer.h5DatasetModel.h5DatasetModel(h5_object)
+        # dataset has been selected
+
+        # retrieve existing model or create a new one
+        if not h5_path in self.entities:
+            self.entities[h5_path] = h5DatasetModel(h5_object)
+
+        # clear tree view columns & create new ones
         for c in self.dset_tree.get_columns():
             self.dset_tree.remove_column(c)
         col = Gtk.TreeViewColumn("#")
@@ -80,13 +88,15 @@ class h5Document(GObject.Object):
         col.pack_start(cell, False)
         col.add_attribute(cell, "text", 0)
         self.dset_tree.append_column(col)
-        for i in range(new_model.do_get_n_columns() - 1):
+        for i in range(self.entities[h5_path].do_get_n_columns() - 1):
             col = Gtk.TreeViewColumn(str(i))
             cell = Gtk.CellRendererText()
             col.pack_start(cell, False)
             col.add_attribute(cell, "text", i+1)
             self.dset_tree.append_column(col)
-        self.dset_tree.set_model(new_model)
+
+        # put changes in effect
+        self.dset_tree.set_model(self.entities[h5_path])
         self.stack.set_visible_child_name("dataset-tree")
 
     def on_close(self, window, event):
