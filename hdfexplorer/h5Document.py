@@ -86,17 +86,21 @@ class h5Document(GObject.Object):
         col = Gtk.TreeViewColumn("")
         cell = Gtk.CellRendererText()
         cell.set_property("foreground", "#979a9b")
-        cell.set_property("xalign", 0.5)
+        cell.set_property("xalign", 1.0)
         cell.set_property("font", "Cantarell Bold 11")
         col.pack_start(cell, False)
         col.add_attribute(cell, "text", 0)
+        col.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        col.set_expand(True)
         self.dset_tree.append_column(col)
         for i in range(self.entities[h5_path].do_get_n_columns() - 1):
             col = Gtk.TreeViewColumn(str(i))
             cell = Gtk.CellRendererText()
-            cell.set_property("xalign", 1.0)
+            cell.set_property("xalign", 0.0)
             col.pack_start(cell, False)
             col.add_attribute(cell, "text", i+1)
+            col.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+            col.set_expand(True)
             self.dset_tree.append_column(col)
 
         # put changes in effect
