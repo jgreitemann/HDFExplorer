@@ -1,3 +1,4 @@
+import numpy as np
 import h5py
 import gi
 gi.require_version('Gtk', '3.0')
@@ -7,6 +8,8 @@ class h5DatasetModel(GObject.Object, Gtk.TreeModel):
     def __init__(self, d):
         self._h5dset = d
         self._h5view = self._h5dset
+        self._cache_line = None
+        self._cache_index = None
         GObject.GObject.__init__(self)
 
     def do_get_flags(self):
@@ -51,7 +54,10 @@ class h5DatasetModel(GObject.Object, Gtk.TreeModel):
             return str(self._h5view[...])
         if len(self._h5view.shape) == 1:
             return str(self._h5view[iter.user_data])
-        return str(self._h5view[iter.user_data, column - 1])
+        if self._cache_index != iter.user_data:
+            self._cache_line = np.array(self._h5view[iter.user_data])
+            self._cache_index = iter.user_data
+        return str(self._cache_line[column - 1])
 
     def do_iter_next(self, iter):
         if len(self._h5view.shape) > 0:
