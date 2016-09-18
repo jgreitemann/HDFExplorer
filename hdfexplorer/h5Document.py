@@ -23,6 +23,10 @@ class h5Document(GObject.Object):
         self.app.add_window(self.window)
         self.tree_view = builder.get_object("content-view")
         self.stack = builder.get_object("stack")
+        self.dset_icon = builder.get_object("dataset-icon")
+        self.dset_name_label = builder.get_object("dataset-name-label")
+        self.dset_shape_label = builder.get_object("dataset-shape-label")
+        self.dset_datatype_label = builder.get_object("dataset-datatype-label")
         self.dset_tree = builder.get_object("dataset-tree")
 
         dset_col = Gtk.TreeViewColumn("Datasets")
@@ -80,6 +84,12 @@ class h5Document(GObject.Object):
         if not h5_path in self.entities:
             self.entities[h5_path] = h5DatasetModel(h5_object)
 
+        # Overview tab
+        self.dset_name_label.set_label(basename(h5_object.name))
+        self.dset_shape_label.set_label(str_shape(h5_object.shape))
+        self.dset_datatype_label.set_label(str(h5_object.dtype))
+
+        # Data tab
         # clear tree view columns & create new ones
         for c in self.dset_tree.get_columns():
             self.dset_tree.remove_column(c)
@@ -115,3 +125,12 @@ class h5Document(GObject.Object):
             self.model = None
             self._h5f.close()
         self.app.documents.remove(self)
+
+def str_shape(shape):
+    if len(shape) == 0:
+        return "Scalar"
+    if len(shape) == 1:
+        return "Vector ({})".format(shape[0])
+    if len(shape) == 2:
+        return "Matrix ({} x {})".format(shape[0], shape[1])
+    return "Tensor ({})".format(" x ".join(map(str, shape)))
