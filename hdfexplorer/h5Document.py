@@ -105,7 +105,7 @@ class h5Document(GObject.Object):
 
         # put changes in effect
         self.dset_tree.set_model(self.entities[h5_path])
-        self.stack.set_visible_child_name("dataset-scroll")
+        self.stack.set_visible_child_name("dataset-notebook")
 
     def on_close(self, window, event):
         self.app.remove_window(window)
