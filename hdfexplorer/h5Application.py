@@ -59,16 +59,15 @@ class h5Application(Gtk.Application):
         chooser.add_filter(filter_any)
 
         res = chooser.run()
-        if res == Gtk.ResponseType.ACCEPT:
-            self.open_filename(chooser.get_filename())
-
+        filename = chooser.get_filename()
         chooser.destroy()
+        if res == Gtk.ResponseType.ACCEPT:
+            self.open_filename(filename)
 
     def open_filename(self, filename):
-        if self.documents and self.documents[-1].model is None:
-            self.documents[-1].load(filename)
-        else:
-            self.documents.append(h5Document(self, path=filename))
+        if not self.documents or not self.documents[-1].model is None:
+            self.documents.append(h5Document(self))
+        self.documents[-1].load(filename)
 
     def on_about(self, action, param):
         about_file = path.join(path.dirname(__file__), "data/glade/about.glade")

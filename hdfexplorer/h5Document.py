@@ -9,7 +9,7 @@ from .h5DatasetModel import h5DatasetModel
 
 class h5Document(GObject.Object):
 
-    def __init__(self, application, *args, path=None, **kwargs):
+    def __init__(self, application, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.app = application
 
@@ -34,9 +34,6 @@ class h5Document(GObject.Object):
         dset_col.add_attribute(name_cell, "text", 0)
         self.tree_view.append_column(dset_col)
 
-        if path is not None:
-            self.load(path)
-
         handlers = {"on_close": self.on_close,
                     "on_selection_changed": self.on_selection_changed}
         builder.connect_signals(handlers)
@@ -60,6 +57,7 @@ class h5Document(GObject.Object):
             message.format_secondary_text("{}".format(e))
             message.run()
             message.destroy()
+            self.window.close()
             return
         self.window.set_title(basename(path))
         self.model = h5TreeModel(self._h5f)
