@@ -6,6 +6,7 @@ from gi.repository import GObject, Gtk, Pango
 
 from .h5TreeModel import h5TreeModel
 from .h5DatasetModel import h5DatasetModel
+from .h5AttributesModel import h5AttributesModel
 
 class h5Document(GObject.Object):
 
@@ -30,6 +31,21 @@ class h5Document(GObject.Object):
         self.dset_shape_label = builder.get_object("dataset-shape-label")
         self.dset_datatype_label = builder.get_object("dataset-datatype-label")
         self.dset_path_label = builder.get_object("dataset-path-label")
+
+        # set up attributes tree
+        self.dset_attributes_tree = builder.get_object("dataset-attributes-tree")
+        col = Gtk.TreeViewColumn("Key")
+        cell = Gtk.CellRendererText()
+        col.pack_start(cell, False)
+        col.add_attribute(cell, "text", 0)
+        self.dset_attributes_tree.append_column(col)
+        col = Gtk.TreeViewColumn("Value")
+        cell = Gtk.CellRendererText()
+        col.pack_start(cell, False)
+        col.add_attribute(cell, "text", 1)
+        self.dset_attributes_tree.append_column(col)
+
+        # set up data tree
         self.dset_tree = builder.get_object("dataset-tree")
 
         dset_col = Gtk.TreeViewColumn("Datasets")
@@ -92,6 +108,9 @@ class h5Document(GObject.Object):
         self.dset_path_label.set_label(h5_object.name)
         self.dset_shape_label.set_label(str_shape(h5_object.shape))
         self.dset_datatype_label.set_label(str(h5_object.dtype))
+
+        # Attributes tab
+        self.dset_attributes_tree.set_model(h5AttributesModel(h5_object.attrs))
 
         # Data tab
         # clear tree view columns & create new ones
