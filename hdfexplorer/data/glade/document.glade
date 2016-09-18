@@ -154,7 +154,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="label" translatable="yes">1x1</property>
+                                <property name="label" translatable="yes">Scalar</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
@@ -180,11 +180,37 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">start</property>
-                                <property name="label" translatable="yes">32 bit Integer</property>
+                                <property name="label" translatable="yes">uint32</property>
                               </object>
                               <packing>
                                 <property name="left_attach">1</property>
                                 <property name="top_attach">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="dataset-path-key-label">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">end</property>
+                                <property name="margin_left">25</property>
+                                <property name="margin_right">10</property>
+                                <property name="label" translatable="yes">Full path:</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">0</property>
+                                <property name="top_attach">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="dataset-path-label">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="label" translatable="yes">/path/to/dataset</property>
+                              </object>
+                              <packing>
+                                <property name="left_attach">1</property>
+                                <property name="top_attach">3</property>
                               </packing>
                             </child>
                           </object>

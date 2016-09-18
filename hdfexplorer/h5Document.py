@@ -27,6 +27,7 @@ class h5Document(GObject.Object):
         self.dset_name_label = builder.get_object("dataset-name-label")
         self.dset_shape_label = builder.get_object("dataset-shape-label")
         self.dset_datatype_label = builder.get_object("dataset-datatype-label")
+        self.dset_path_label = builder.get_object("dataset-path-label")
         self.dset_tree = builder.get_object("dataset-tree")
 
         dset_col = Gtk.TreeViewColumn("Datasets")
@@ -86,6 +87,7 @@ class h5Document(GObject.Object):
 
         # Overview tab
         self.dset_name_label.set_label(basename(h5_object.name))
+        self.dset_path_label.set_label(h5_object.name)
         self.dset_shape_label.set_label(str_shape(h5_object.shape))
         self.dset_datatype_label.set_label(str(h5_object.dtype))
 
