@@ -24,6 +24,8 @@ class h5Document(GObject.Object):
         self.tree_view = builder.get_object("content-view")
         self.stack = builder.get_object("stack")
         self.dset_icon = builder.get_object("dataset-icon")
+        dset_icon_file = join(dirname(__file__), "data/icons/dataset_48.png")
+        self.dset_icon.set_from_file(dset_icon_file)
         self.dset_name_label = builder.get_object("dataset-name-label")
         self.dset_shape_label = builder.get_object("dataset-shape-label")
         self.dset_datatype_label = builder.get_object("dataset-datatype-label")
