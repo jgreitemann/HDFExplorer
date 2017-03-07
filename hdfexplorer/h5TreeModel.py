@@ -29,12 +29,13 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
     def do_get_iter(self, path):
         seq = []
         base = self.h5file
-        for i in path.get_indices():
-            if base is None or i >= len(base):
-                return (False, None)
-            sorted_keys = sorted(list(base.keys()))
-            seq.append(sorted_keys[i])
-            base = base[sorted_keys[i]]
+        if len(path.get_indices()) > 1:
+            for i in path.get_indices()[1:]:
+                if base is None or i >= len(base):
+                    return (False, None)
+                sorted_keys = sorted(list(base.keys()))
+                seq.append(sorted_keys[i])
+                base = base[sorted_keys[i]]
         seq = tuple(seq)
         self.pool[abshash(seq)] = seq
         iter = Gtk.TreeIter()
@@ -55,7 +56,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
     #     print("get_iter_first")
 
     def do_get_path(self, iter):
-        indices = []
+        indices = [0]
         base = self.h5file
         for key in self.pool[iter.user_data]:
             if not key in base:
@@ -77,6 +78,11 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         return (pathstr, base)
 
     def do_get_value(self, iter, column):
+        if self.pool[iter.user_data] == ():
+            if column == 0:
+                return "/"
+            elif column == 1:
+                return self.group_pixbuf
         if column == 0:
             return self.pool[iter.user_data][-1]
         elif column == 1:
@@ -88,13 +94,12 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
 
     def do_iter_next(self, iter):
         if iter.user_data is None:
-            sorted_keys = sorted(list(self.h5file.keys()))
-            if not sorted_keys:
-                return (False, None)
-            ud = (sorted_keys[0],)
+            ud = ()
             self.pool[abshash(ud)] = ud
             iter.user_data = abshash(ud)
             return (True, iter)
+        if self.pool[iter.user_data] == ():
+            return (False, None)
         base = self.h5file
         for key in self.pool[iter.user_data][:-1]:
             if not key in base:
@@ -126,8 +131,16 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
     #     print("iter_n_children")
 
     def do_iter_nth_child(self, parent, n):
+        if parent is None:
+            if n >= 1:
+                return (False, None)
+            else:
+                iter = Gtk.TreeIter()
+                iter.user_data = abshash(())
+                iter.user_data2 = 82
+                return (True, iter)
         base = self.h5file
-        if parent is not None:
+        if self.pool[parent.user_data] != ():
             for key in self.pool[parent.user_data]:
                 if not key in base:
                     return (False, None)
@@ -147,8 +160,6 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
 
     def do_iter_parent(self, child):
         ud = self.pool[child.user_data][:-1]
-        if not ud:
-            return (False, None)
         self.pool[abshash(ud)] = ud
         iter = Gtk.TreeIter()
         iter.user_data = abshash(ud)
