@@ -101,6 +101,7 @@ class h5Document(GObject.Object):
         self.window.set_title(basename(path))
         self.model = h5TreeModel(self._h5f)
         self.tree_view.set_model(self.model)
+        self.tree_view.expand_all()
 
     def on_selection_changed(self, tree_selection):
         model, iter = tree_selection.get_selected()

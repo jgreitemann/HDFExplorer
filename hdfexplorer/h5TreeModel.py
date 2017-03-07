@@ -150,7 +150,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
             ud = self.pool[parent.user_data]
         else:
             ud = ()
-        if n >= len(base):
+        if not isinstance(base, h5py.Group) or n >= len(base):
             return (False, None)
         sorted_keys = sorted(list(base.keys()))
         ud += (sorted_keys[n],)
