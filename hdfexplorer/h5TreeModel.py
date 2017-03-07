@@ -80,7 +80,10 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         if column == 0:
             return self.pool[iter.user_data][-1]
         elif column == 1:
-            return self.group_pixbuf if self.do_iter_has_child(iter) \
+            base = self.h5file
+            for key in self.pool[iter.user_data]:
+                base = base[key]
+            return self.group_pixbuf if isinstance(base, h5py.Group) \
                     else self.dataset_pixbuf
 
     def do_iter_next(self, iter):
@@ -117,7 +120,7 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
         base = self.h5file
         for key in self.pool[iter.user_data]:
             base = base[key]
-        return isinstance(base, h5py.Group)
+        return isinstance(base, h5py.Group) and len(base) > 0
 
     # def do_iter_n_children(self, iter):
     #     print("iter_n_children")
