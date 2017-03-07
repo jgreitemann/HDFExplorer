@@ -15,6 +15,8 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
                                          .load_icon()
         icon_file = path.join(path.dirname(__file__), "data/icons/dataset.png")
         self.dataset_pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_file)
+        icon_file = path.join(path.dirname(__file__), "data/icons/document.png")
+        self.document_pixbuf = GdkPixbuf.Pixbuf.new_from_file(icon_file)
         GObject.GObject.__init__(self)
 
     def do_get_flags(self):
@@ -80,9 +82,9 @@ class h5TreeModel(GObject.Object, Gtk.TreeModel):
     def do_get_value(self, iter, column):
         if self.pool[iter.user_data] == ():
             if column == 0:
-                return "/"
+                return path.basename(self.h5file.filename)
             elif column == 1:
-                return self.group_pixbuf
+                return self.document_pixbuf
         if column == 0:
             return self.pool[iter.user_data][-1]
         elif column == 1:
