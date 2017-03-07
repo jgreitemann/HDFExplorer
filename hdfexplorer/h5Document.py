@@ -151,7 +151,10 @@ class h5Document(GObject.Object):
             self.stack.set_visible_child_name("dataset-notebook")
         elif isinstance(h5_object, h5py.Group):
             # Overview tab
-            self.group_name_label.set_label(basename(h5_object.name))
+            name = basename(h5_object.name)
+            if name == "":
+                name = "Document Root"
+            self.group_name_label.set_label(name)
             self.group_path_label.set_label(h5_object.name)
             self.group_children_label.set_label(str(len(h5_object)))
 
